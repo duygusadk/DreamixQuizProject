@@ -1,8 +1,9 @@
 package com.example.demo.controller;
 
 
-import com.example.demo.entity.Users;
+import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,12 +20,12 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public List<Users> findAllUsers(){
+    public List<User> findAllUsers(){
         return userService.findAllUsers();
     }
 
     @PostMapping
-    public ResponseEntity<String> addUser(@RequestBody Users user){
+    public ResponseEntity<String> addUser(@Valid @RequestBody User user){
         try {
             userService.save(user);
             return new ResponseEntity<>("The user is created", HttpStatus.CREATED);
@@ -34,7 +35,7 @@ public class UserController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody @NonNull Users updatedUser) {
+    public ResponseEntity<String> updateUser(@PathVariable Long id,@Valid @RequestBody User updatedUser) {
          try {
              userService.update(updatedUser, id);
              return new ResponseEntity<>("The user is updated", HttpStatus.OK);

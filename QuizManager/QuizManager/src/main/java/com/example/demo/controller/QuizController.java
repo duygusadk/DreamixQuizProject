@@ -5,6 +5,7 @@ import com.example.demo.entity.UserResponse;
 import com.example.demo.service.QuestionService;
 import com.example.demo.service.QuizService;
 import com.example.demo.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class QuizController {
     }
 
     @PostMapping("/add/{userId}")
-    public ResponseEntity<String> addQuiz(@PathVariable Long userId,@RequestBody Quiz quiz){
+    public ResponseEntity<String> addQuiz(@PathVariable Long userId,@Valid @RequestBody Quiz quiz){
         try {
             quizService.save(quiz, userId);
             return new ResponseEntity<>("The quiz is created", HttpStatus.CREATED);
@@ -40,14 +41,14 @@ public class QuizController {
         }
     }
     @PostMapping(path ="/{id}/submit")
-    public ResponseEntity<String>submitQuiz(@PathVariable Long id,@RequestBody List<UserResponse>response){
+    public ResponseEntity<String>submitQuiz(@PathVariable Long id,@Valid @RequestBody List<UserResponse>response){
 
         return quizService.calculateResult(id,response);
 
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateQuiz(@PathVariable Long id, @RequestBody Quiz updatedQuiz) {
+    public ResponseEntity<String> updateQuiz(@PathVariable Long id, @Valid @RequestBody Quiz updatedQuiz) {
         try {
             quizService.update(updatedQuiz,id);
             return new ResponseEntity<>("The quiz is updated", HttpStatus.CREATED);

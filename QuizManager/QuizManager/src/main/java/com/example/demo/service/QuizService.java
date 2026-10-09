@@ -3,7 +3,7 @@ package com.example.demo.service;
 import com.example.demo.entity.Question;
 import com.example.demo.entity.Quiz;
 import com.example.demo.entity.UserResponse;
-import com.example.demo.entity.Users;
+import com.example.demo.entity.User;
 import com.example.demo.repository.QuizRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +36,9 @@ public class QuizService {
 
     public ResponseEntity<Quiz> save(Quiz quiz, Long userId) {
 
-        Users user=userRepository.findById(userId).get();
+        User user=userRepository.findById(userId).get();
         if(user.getId()==null){ throw new NoSuchElementException();}
-        quiz.setUsers(user);
+        quiz.setUser(user);
         user.getQuizzes().add(quiz);
         userRepository.save(user);
 

@@ -2,11 +2,10 @@ package com.example.demo.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import org.antlr.v4.runtime.misc.NotNull;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,23 +17,20 @@ import java.util.List;
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
-
-
-        @NonNull
+        @NotBlank
         private String title;
 
         private String description;
 
-       // @JsonIgnore
         @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
         private List<Question> questions;
         @NonNull @JsonIgnore
         @ManyToOne
-        @JoinColumn(name = "users_id", referencedColumnName = "id")
-        private Users users;
+        @JoinColumn(name = "user_id", referencedColumnName = "id")
+        private User user;
 
 
-    public Quiz(@NonNull String title, String description) {
+    public Quiz(String title, String description) {
         this.title = title;
         this.description = description;
 

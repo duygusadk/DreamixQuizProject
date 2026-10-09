@@ -24,8 +24,8 @@ public class QuestionService {
 
     public ResponseEntity<List<Question>>findAllQuestions(Long id){
         try {
-            Optional<Quiz> quiz=quizRepository.findById(id);
-            List<Question>questions=quiz.get().getQuestions();
+            Quiz quiz=quizRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Quiz not found with id: "+id));
+            List<Question>questions=quiz.getQuestions();
 
             return new ResponseEntity<>(questions, HttpStatus.OK);
 
