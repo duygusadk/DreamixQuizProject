@@ -1,6 +1,7 @@
 package com.example.demo.dto.response;
 
 import com.example.demo.entity.Question;
+import com.example.demo.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,4 +16,5 @@ public class QuizResponseDto {
     private String title;
     private String description;
     private List<Question> questions;
+    private User user;
 }

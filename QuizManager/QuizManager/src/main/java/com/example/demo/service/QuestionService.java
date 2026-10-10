@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.entity.Question;
 import com.example.demo.entity.Quiz;
+import com.example.demo.entity.UserResponse;
 import com.example.demo.repository.QuestionRepository;
 import com.example.demo.repository.QuizRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +36,29 @@ public class QuestionService {
         }
 
     }
-    public ResponseEntity<List<Question>> findAllQuestionsWithoutAnswers(Long quizId) {
-        Optional<Quiz> quiz=quizRepository.findById(quizId);
-
+    public ResponseEntity<String> calculateResult(Long id, List<UserResponse> responses) {
+        Optional<Quiz> quiz=quizRepository.findById(id);
+        if(quiz.isEmpty()){throw  new NoSuchElementException();}
         List<Question>questions=quiz.get().getQuestions();
+        int i=0;
+        int rightAnswers=0;
+        for(UserResponse response:responses){
+            if(response.getResponse().equals(questions.get(i).getCorrectAnswer())){
+                rightAnswers=rightAnswers+questions.get(i).getPoint();
+
+            }
+            i++;
+        }
+        return  new ResponseEntity<>("Result:"+rightAnswers,HttpStatus.OK);
+    }
+    public ResponseEntity<List<Question>> findAllQuestionsWithoutAnswers(Long quizId) {
+        Quiz quiz=quizRepository.findById(quizId).orElseThrow(() -> new NoSuchElementException("Quiz not found with id: "+quizId));
+
+        List<Question>questions=quiz.getQuestions();
         List<Question>forUser=new ArrayList<>();
 
         for (Question q :questions){
-            Question q1=new Question(q.getId(),q.getContent(),q.getOption1(),q.getOption2(),q.getOption3(),q.getOption4(),q.getPoint());
+            Question q1=new Question();
             forUser.add(q1);
         }
         return new ResponseEntity<>(forUser,HttpStatus.OK);

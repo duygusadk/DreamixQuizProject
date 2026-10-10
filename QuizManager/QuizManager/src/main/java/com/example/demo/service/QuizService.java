@@ -1,9 +1,12 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.request.QuizRequestDto;
+import com.example.demo.dto.response.QuizResponseDto;
 import com.example.demo.entity.Question;
 import com.example.demo.entity.Quiz;
 import com.example.demo.entity.UserResponse;
 import com.example.demo.entity.User;
+import com.example.demo.mapper.QuizMapper;
 import com.example.demo.repository.QuizRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class QuizService {
@@ -22,36 +26,36 @@ public class QuizService {
     private QuizRepository quizRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private QuizMapper quizMapper;
 
-
-    public List<Quiz> findAllQuiz(){
-        return quizRepository.findAll();
+    public List<QuizResponseDto> findAllQuiz(){
+       return quizRepository.findAll().stream().map(quizMapper::toDto).collect(Collectors.toList());
     }
 
 
-    public Quiz findById(Long id){
-        return  quizRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Quiz not found with ID: " + id));
+    public QuizResponseDto findById(Long id) {
+        return quizRepository.findById(id).stream().map(quizMapper::toDto).findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Quiz not found with id: " + id));
     }
 
+    public QuizResponseDto create(QuizRequestDto quiz, Long userId) {
 
-    public ResponseEntity<Quiz> save(Quiz quiz, Long userId) {
-
-        User user=userRepository.findById(userId).get();
-        if(user.getId()==null){ throw new NoSuchElementException();}
-        quiz.setUser(user);
-        user.getQuizzes().add(quiz);
+        User user=userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found with id: "+userId));
+        Quiz quizEntity=quizMapper.toEntity(quiz);
+        user.getQuizzes().add(quizEntity);
         userRepository.save(user);
 
-        return new ResponseEntity<>(quizRepository.save(quiz),HttpStatus.CREATED);
+        return quizMapper.toDto(quizEntity);
     }
-    public Quiz update(Quiz quiz,Long id){
+    public QuizResponseDto update(QuizRequestDto quiz,Long id){
 
         Quiz updatedQuiz=quizRepository.findById(id).get();
         if(updatedQuiz.getId()==null){throw new NoSuchElementException();}
         updatedQuiz.setTitle(quiz.getTitle());
         updatedQuiz.setDescription(quiz.getDescription());
 
-        return quizRepository.save(updatedQuiz);
+        return quizMapper.toDto(quizRepository.save(updatedQuiz));
 
     }
     public void deleteById(Long id) {
@@ -59,19 +63,4 @@ public class QuizService {
 
     }
 
-    public ResponseEntity<String> calculateResult(Long id, List<UserResponse> responses) {
-        Optional<Quiz> quiz=quizRepository.findById(id);
-        if(quiz.isEmpty()){throw  new NoSuchElementException();}
-        List<Question>questions=quiz.get().getQuestions();
-        int i=0;
-        int rightAnswers=0;
-        for(UserResponse response:responses){
-            if(response.getResponse().equals(questions.get(i).getCorrectAnswer())){
-                 rightAnswers=rightAnswers+questions.get(i).getPoint();
-
-            }
-          i++;
-        }
-        return  new ResponseEntity<>("Result:"+rightAnswers,HttpStatus.OK);
-    }
 }

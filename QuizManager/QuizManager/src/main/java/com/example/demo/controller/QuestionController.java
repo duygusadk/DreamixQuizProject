@@ -17,9 +17,6 @@ public class QuestionController {
     @Autowired
     private QuestionService questionService;
 
-    @Autowired
-    private QuizService quizService;
-
 
     @GetMapping("/{quizId}/question/get")
     public  ResponseEntity<List<Question>>getQuestions(@PathVariable Long quizId){

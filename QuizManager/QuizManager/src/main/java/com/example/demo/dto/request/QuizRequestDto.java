@@ -11,5 +11,7 @@ import lombok.NoArgsConstructor;
 public class QuizRequestDto {
 
     private String title;
+    private String description;
+    private Long userId;
 
 }
